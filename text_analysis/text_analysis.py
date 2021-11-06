@@ -1,5 +1,10 @@
 '''
 Example of using Azure Cognitive Services Text Analysis.
+From a given text, it obtains:
+    - language
+    - sentiment
+    - entities
+    - links
 The credentials are stored in Azure Key Vault.
 '''
 import os
@@ -15,7 +20,6 @@ def get_key_from_keyvault():
     ''' Get key from keyvault'''
     try:
         # Get Configuration Settings
-#        cog_endpoint = os.getenv('COG_SERVICE_ENDPOINT')
         key_vault_name = os.getenv('KEY_VAULT')
         app_tenant = os.getenv('TENANT_ID')
         app_id = os.getenv('APP_ID')
@@ -54,10 +58,10 @@ def main():
         reviews_folder = 'example_text'
         for file_name in os.listdir(reviews_folder):
             # Read the file contents
-            print(f"\n-------------\n {file_name}")
+            print(f"\n---------------------------\nFilename: {file_name}")
             with open(os.path.join(reviews_folder, file_name), encoding='utf8') as file_handle:
                 text = file_handle.read()
-                print(f"\n {text}")
+                print(f"\n{text}")
 
             # Get language
             detected_language = cog_client.detect_language(documents=[text])[0]
@@ -70,21 +74,21 @@ def main():
             # Get key phrases
             phrases = cog_client.extract_key_phrases(documents=[text])[0].key_phrases
             if len(phrases) > 0:
-                print("\nKey Phrases:")
+                print(f"\nKey Phrases ({len(phrases)})")
                 for phrase in phrases:
                     print(f"\t{phrase}")
 
             # Get entities
             entities = cog_client.recognize_entities(documents=[text])[0].entities
             if len(entities) > 0:
-                print("\nEntities")
+                print(f"\nEntities ({len(entities)})")
                 for entity in entities:
                     print(f"\t{entity.text} ({entity.category})")
 
             # Get linked entities
             entities = cog_client.recognize_linked_entities(documents=[text])[0].entities
             if len(entities) > 0:
-                print("\nLinks")
+                print(f"\nLinks ({len(entities)})")
                 for linked_entity in entities:
                     print(f"\t{linked_entity.name} ({linked_entity.url})")
 
