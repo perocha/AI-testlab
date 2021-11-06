@@ -1,5 +1,9 @@
-from dotenv import load_dotenv
+'''
+Example of using Azure Cognitive Services Text Analysis.
+The credentials are stored in Azure Key Vault.
+'''
 import os
+from dotenv import load_dotenv
 
 # Import namespaces
 from azure.core.credentials import AzureKeyCredential
@@ -7,11 +11,11 @@ from azure.ai.textanalytics import TextAnalyticsClient
 from azure.keyvault.secrets import SecretClient
 from azure.identity import ClientSecretCredential
 
-def main():
+def get_key_from_keyvault():
+    ''' Get key from keyvault'''
     try:
         # Get Configuration Settings
-        load_dotenv()
-        cog_endpoint = os.getenv('COG_SERVICE_ENDPOINT')
+#        cog_endpoint = os.getenv('COG_SERVICE_ENDPOINT')
         key_vault_name = os.getenv('KEY_VAULT')
         app_tenant = os.getenv('TENANT_ID')
         app_id = os.getenv('APP_ID')
@@ -24,50 +28,68 @@ def main():
         secret_key = keyvault_client.get_secret("Cognitive-Services-Key")
         cog_key = secret_key.value
 
-        # Create client using endpoint and key
         credential = AzureKeyCredential(cog_key)
+
+        return credential
+
+    except Exception as ex:
+        print(f"get_key_from_keyvault:Exception: {ex}")
+        return None
+
+
+def main():
+    ''' Main function'''
+    try:
+        # Get Configuration Settings
+        load_dotenv()
+        cog_endpoint = os.getenv('COG_SERVICE_ENDPOINT')
+
+        # Get credentials from Azure Key Vault
+        credential = get_key_from_keyvault()
+
+        # Create client using endpoint and key
         cog_client = TextAnalyticsClient(endpoint=cog_endpoint, credential=credential)
 
         # Analyze each text file in the reviews folder
         reviews_folder = 'example_text'
         for file_name in os.listdir(reviews_folder):
             # Read the file contents
-            print('\n-------------\n' + file_name)
-            text = open(os.path.join(reviews_folder, file_name), encoding='utf8').read()
-            print('\n' + text)
+            print(f"\n-------------\n {file_name}")
+            with open(os.path.join(reviews_folder, file_name), encoding='utf8') as file_handle:
+                text = file_handle.read()
+                print(f"\n {text}")
 
             # Get language
-            detectedLanguage = cog_client.detect_language(documents=[text])[0]
-            print('\nLanguage: {}'.format(detectedLanguage.primary_language.name))
+            detected_language = cog_client.detect_language(documents=[text])[0]
+            print(f"\nLanguage: {detected_language.primary_language.name}")
 
             # Get sentiment
-            sentimentAnalysis = cog_client.analyze_sentiment(documents=[text])[0]
-            print("\nSentiment: {}".format(sentimentAnalysis.sentiment))
+            sentiment_analysis = cog_client.analyze_sentiment(documents=[text])[0]
+            print(f"\nSentiment: {sentiment_analysis.sentiment}")
 
             # Get key phrases
             phrases = cog_client.extract_key_phrases(documents=[text])[0].key_phrases
             if len(phrases) > 0:
                 print("\nKey Phrases:")
                 for phrase in phrases:
-                    print('\t{}'.format(phrase))
+                    print(f"\t{phrase}")
 
             # Get entities
             entities = cog_client.recognize_entities(documents=[text])[0].entities
             if len(entities) > 0:
                 print("\nEntities")
                 for entity in entities:
-                    print('\t{} ({})'.format(entity.text, entity.category))
+                    print(f"\t{entity.text} ({entity.category})")
 
             # Get linked entities
             entities = cog_client.recognize_linked_entities(documents=[text])[0].entities
             if len(entities) > 0:
                 print("\nLinks")
                 for linked_entity in entities:
-                    print('\t{} ({})'.format(linked_entity.name, linked_entity.url))
-
+                    print(f"\t{linked_entity.name} ({linked_entity.url})")
 
     except Exception as ex:
-        print(ex)
+        print(f"Exception: {ex}")
 
 
 if __name__ == "__main__":
