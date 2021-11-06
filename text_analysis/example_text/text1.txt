@@ -1,0 +1,4 @@
+Example text
+6/11/2021
+This is just a text to test the text analysis by Azure
+Madrid
