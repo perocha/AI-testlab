@@ -7,10 +7,11 @@ From a given text, it obtains:
     - links
 The credentials are stored in Azure Key Vault.
 '''
-import os
-from dotenv import load_dotenv
+#pylint: disable=broad-except
 
 # Import namespaces
+import os
+from dotenv import load_dotenv
 from azure.core.credentials import AzureKeyCredential
 from azure.ai.textanalytics import TextAnalyticsClient
 from azure.keyvault.secrets import SecretClient
