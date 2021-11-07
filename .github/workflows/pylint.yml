@@ -22,6 +22,7 @@ jobs:
         pip install azure-ai-textanalytics
         pip install azure-identity
         pip install azure-keyvault-secrets
+        pip install azure-cognitiveservices-speech
     - name: Analysing the code with pylint
       run: |
         pylint $(find . -name "*.py" | xargs)
