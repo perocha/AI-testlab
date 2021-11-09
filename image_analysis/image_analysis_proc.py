@@ -23,6 +23,8 @@ def main():
 
         # Get image from arguments
         image_file = 'images/street.jpg'
+        image_file = "C:/Users/perocha/OneDrive/MyCode/AI-testlab/image_analysis/images/street.jpg"
+
         if len(sys.argv) > 1:
             image_file = sys.argv[1]
 
