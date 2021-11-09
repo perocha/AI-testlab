@@ -23,6 +23,8 @@ jobs:
         pip install azure-identity
         pip install azure-keyvault-secrets
         pip install azure-cognitiveservices-speech
+        pip install matplotlib
+        pip install azure-cognitiveservices-vision-computervision
     - name: Analysing the code with pylint
       run: |
         pylint $(find . -name "*.py" | xargs)
