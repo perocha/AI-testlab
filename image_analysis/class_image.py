@@ -2,13 +2,14 @@
 Image class
 '''
 #pylint: disable=broad-except
-#pylint: disable=line-too-long
 #pylint: disable=consider-using-with
 
 # Import namespaces
 import os
 from PIL import Image, ImageDraw
 from matplotlib import pyplot as plt
+from class_face import Face
+from class_object import Object
 
 class ImageClass:
     '''Image class'''
@@ -24,6 +25,7 @@ class ImageClass:
             self.description = ""
             self.tags = {}
             self.objects = []
+            self.faces = []
 
             # Open the image file
             self.__open_file()
@@ -55,7 +57,6 @@ class ImageClass:
         '''Return the image stream'''
         return self.__file_handler
 
-    # Get objects in the image
     def create_obj_image (self, folder):
         '''Create a new image with all the objects identified in the original image'''
         if len(self.objects) > 0:
@@ -63,17 +64,33 @@ class ImageClass:
             fig = plt.figure(figsize=(8, 8))
             plt.axis('off')
             image = Image.open(self.filename)
-            draw = ImageDraw.Draw(image)
-            color = 'cyan'
             for img_obj in self.objects:
-                # Draw object bounding box
-                bounding_box = ((img_obj.x_coord, img_obj.y_coord), (img_obj.x_coord + img_obj.width, img_obj.y_coord + img_obj.height))
-                draw.rectangle(bounding_box, outline=color, width=3)
-                annotation_string = f"{img_obj.text} {img_obj.confidence * 100:.1f}%"
-                plt.annotate(annotation_string, (img_obj.x_coord, img_obj.y_coord), backgroundcolor=color)
+                if isinstance(img_obj, Face):
+                    annotation_string = f"{img_obj.gender} {img_obj.age}"
+                elif isinstance (img_obj, Object):
+                    annotation_string = f"{img_obj.text} {img_obj.confidence * 100:.1f}%"
+                else:
+                    annotation_string = ""
+                x_coord = img_obj.x_coord
+                y_coord = img_obj.y_coord
+                width = img_obj.width
+                height = img_obj.height
+                self.__draw_rectangle(plt, image, x_coord, y_coord, width, height, annotation_string)
 
             # Save annotated image
             plt.imshow(image)
-            outputfile = f"{folder}/obj_{os.path.basename(self.filename)}"
+            outputfile = f"obj_{os.path.basename(self.filename)}"
+            outputfile = f"{os.curdir}/{folder}/obj_{os.path.basename(self.filename)}"
             fig.savefig(outputfile)
-            print('  Results saved in', outputfile)
+
+    def __draw_rectangle(self,plt, image, x_coord, y_coord, width, height, text):
+        '''Draw a rectangle'''
+        draw = ImageDraw.Draw(image)
+        color = 'cyan'
+
+        # Draw object bounding box
+        bounding_box = ((x_coord, y_coord), \
+            (x_coord + width, y_coord + height))
+        draw.rectangle(bounding_box, outline=color, width=3)
+
+        plt.annotate(text, (x_coord, y_coord), backgroundcolor=color)

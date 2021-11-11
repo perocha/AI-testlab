@@ -1,26 +1,17 @@
 '''
-Object class
+Image object class
 '''
-#pylint: disable=broad-except
 
-# Import namespaces
-
-class ObjectClass:
-    '''Object class'''
+class ImageObject:
+    '''Image object class'''
 
     def __init__(self) -> None:
         '''Constructor'''
-        try:
-            # Initialize variables
-            self.x_coord = 0
-            self.y_coord = 0
-            self.width = 0
-            self.height = 0
-            self.text = ""
-            self.confidence = 0.0
-
-        except Exception as ex:
-            print(ex)
+        # Initialize variables
+        self.x_coord = 0
+        self.y_coord = 0
+        self.width = 0
+        self.height = 0
 
     def __del__(self):
         '''Class destructor'''
@@ -41,7 +32,3 @@ class ObjectClass:
     def get_h (self):
         '''Return the height of the object'''
         return self.height
-
-    def get_text (self):
-        '''Return the text description of the object'''
-        return self.text
