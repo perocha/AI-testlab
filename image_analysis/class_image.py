@@ -71,26 +71,20 @@ class ImageClass:
                     annotation_string = f"{img_obj.text} {img_obj.confidence * 100:.1f}%"
                 else:
                     annotation_string = ""
-                x_coord = img_obj.x_coord
-                y_coord = img_obj.y_coord
-                width = img_obj.width
-                height = img_obj.height
-                self.__draw_rectangle(plt, image, x_coord, y_coord, width, height, annotation_string)
+                draw = ImageDraw.Draw(image)
+                color = 'cyan'
+
+                # Draw object bounding box
+                bounding_box = ((img_obj.get_x(), img_obj.get_y()), \
+                    (img_obj.get_x() + img_obj.get_w(), img_obj.get_y() + img_obj.get_h()))
+                draw.rectangle(bounding_box, outline=color, width=3)
+
+                plt.annotate(annotation_string, (img_obj.get_x(), \
+                    img_obj.get_y()), \
+                    backgroundcolor=color)
 
             # Save annotated image
             plt.imshow(image)
             outputfile = f"obj_{os.path.basename(self.filename)}"
             outputfile = f"{os.curdir}/{folder}/obj_{os.path.basename(self.filename)}"
             fig.savefig(outputfile)
-
-    def __draw_rectangle(self,plt, image, x_coord, y_coord, width, height, text):
-        '''Draw a rectangle'''
-        draw = ImageDraw.Draw(image)
-        color = 'cyan'
-
-        # Draw object bounding box
-        bounding_box = ((x_coord, y_coord), \
-            (x_coord + width, y_coord + height))
-        draw.rectangle(bounding_box, outline=color, width=3)
-
-        plt.annotate(text, (x_coord, y_coord), backgroundcolor=color)

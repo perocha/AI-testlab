@@ -2,6 +2,7 @@
 ComputerVision class
 '''
 #pylint: disable=broad-except
+#pylint: disable=no-member
 
 # Import namespaces
 import os
