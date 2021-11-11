@@ -26,9 +26,10 @@ class ImageClass:
             self.tags = {}
             self.objects = []
             self.faces = []
+            self.text = []
 
             # Open the image file
-            self.__open_file()
+            self.open_file()
 
         except Exception as ex:
             print(ex)
@@ -38,7 +39,7 @@ class ImageClass:
         # Make sure the file is closed
         self.__close_file ()
 
-    def __open_file (self):
+    def open_file (self):
         '''Open image file'''
         if self.filename != "":
             self.__file_handler = open(self.filename, mode="rb")
@@ -85,6 +86,6 @@ class ImageClass:
 
             # Save annotated image
             plt.imshow(image)
-            outputfile = f"obj_{os.path.basename(self.filename)}"
             outputfile = f"{os.curdir}/{folder}/obj_{os.path.basename(self.filename)}"
+            outputfile = f"obj_{os.path.basename(self.filename)}"
             fig.savefig(outputfile)

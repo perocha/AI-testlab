@@ -88,3 +88,19 @@ class ComputerVision:
         except Exception as ex:
             print (ex)
             return False
+
+    def get_text_ocr (self, image_obj):
+        '''
+        Execute image analysis to get text
+        '''
+        # Use OCR API to read text in image
+        ocr_results = self.__cv.recognize_printed_text_in_stream(image_obj.get_image())
+
+        # Process the text line by line
+        image_obj.text = ""
+        for region in ocr_results.regions:
+            for line in region.lines:
+
+                # Read the words in the line of text
+                for word in line.words:
+                    image_obj.text += word.text + ' '

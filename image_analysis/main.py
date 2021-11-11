@@ -9,6 +9,7 @@ def main():
     my_computer_vision = ComputerVision()
 
     image_folder = os.path.join(os.path.curdir, "images")
+    image_folder = "C:/Users/perocha/OneDrive/MyCode/AI-testlab/image_analysis/images"
     for file_name in os.listdir(image_folder):
         print("\n######## Start with new image ########")
         print(f"Image file: {os.path.join(image_folder, file_name)}")
@@ -16,6 +17,9 @@ def main():
         my_img_obj = ImageClass (filepath)
 
         my_computer_vision.image_analysis (my_img_obj)
+
+        my_img_obj.open_file()
+        my_computer_vision.get_text_ocr (my_img_obj)
 
         print (f"Image description: {my_img_obj.description}")
 
@@ -33,6 +37,10 @@ def main():
                 print ("Error")
 
         my_img_obj.create_obj_image ("objects")
+
+        # Print text identified in the image (if any)
+        print(f"Text extracted from image: {my_img_obj.text}")
+
 
     return False
 
