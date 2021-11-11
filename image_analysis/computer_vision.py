@@ -6,9 +6,11 @@ ComputerVision class
 
 # Import namespaces
 import os
+import time
 from dotenv import load_dotenv
 from azure.cognitiveservices.vision.computervision import ComputerVisionClient
 from azure.cognitiveservices.vision.computervision.models import VisualFeatureTypes
+from azure.cognitiveservices.vision.computervision.models import OperationStatusCodes
 from msrest.authentication import CognitiveServicesCredentials
 from class_object import Object
 from class_face import Face
@@ -94,19 +96,67 @@ class ComputerVision:
         '''
         Execute image analysis to get text
         '''
-        # Use OCR API to read text in image
-        image_obj.open_file()
-        ocr_results = self.__cv.recognize_printed_text_in_stream(image_obj.get_image())
+        try:
+            # Use OCR API to read text in image
+            image_obj.open_file()
+            ocr_results = self.__cv.recognize_printed_text_in_stream(image_obj.get_image())
 
-        # Process the text line by line
-        for region in ocr_results.regions:
-            for line in region.lines:
-                # Start a new line
-                line_string = ""
+            # Make sure the image object doesn't have any previous text
+            if len(image_obj.text) > 0:
+                image_obj.text = []
+            # Process the text line by line
+            for region in ocr_results.regions:
+                for line in region.lines:
+                    # Start a new line
+                    line_string = ""
 
-                # Read the words in the line of text
-                for word in line.words:
-                    line_string += word.text + " "
+                    # Read the words in the line of text
+                    for word in line.words:
+                        line_string += word.text + " "
 
-                # Once a new line is generated, add it to the image object
-                image_obj.text.append (line_string)
+                    # Once a new line is generated, add it to the image object
+                    image_obj.text.append (line_string)
+
+            return True
+
+        except Exception as ex:
+            print (ex)
+            return False
+
+    def read_text_from_image (self, image_obj):
+        '''
+        Read text from image
+        '''
+        try:
+            # Use Read API to read text in image
+            image_obj.open_file()
+            read_op = self.__cv.read_in_stream(image_obj.get_image(), raw=True)
+
+            # Get the async operation ID so we can check for the results
+            operation_location = read_op.headers["Operation-Location"]
+            operation_id = operation_location.split("/")[-1]
+
+            # Wait for the asynchronous operation to complete
+            while True:
+                read_results = self.__cv.get_read_result(operation_id)
+                if read_results.status not in [OperationStatusCodes.running, \
+                    OperationStatusCodes.not_started]:
+                    break
+                time.sleep(1)
+
+            # If the operation was successfuly, process the text line by line
+            if read_results.status == OperationStatusCodes.succeeded:
+                # First delete the existing text, if any
+                if len(image_obj.text) > 0:
+                    image_obj.text = []
+                # Get the results
+                for page in read_results.analyze_result.read_results:
+                    for line in page.lines:
+                        # Add the line to the image object
+                        image_obj.text.append (line.text)
+
+            return True
+
+        except Exception as ex:
+            print (ex)
+            return False

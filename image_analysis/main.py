@@ -22,9 +22,6 @@ def main():
         # Execute image analysis
         my_computer_vision.image_analysis (my_img_obj)
 
-        # Execute text extraction from the image
-        my_computer_vision.get_text_ocr (my_img_obj)
-
         # Print the description
         print (f"Image description: {my_img_obj.description}")
 
@@ -45,6 +42,18 @@ def main():
 
         # Create a new image with a box surrounding every identified object or face
         my_img_obj.create_obj_image ("objects")
+
+        # Execute text extraction from the image
+        my_computer_vision.get_text_ocr (my_img_obj)
+
+        # Print text identified in the image (if any)
+        if len(my_img_obj.text) > 0:
+            print("Text extracted from image:")
+            for line in my_img_obj.text:
+                print(f"{line}")
+
+        # Execute text extraction from the image using the Read API
+        my_computer_vision.read_text_from_image (my_img_obj)
 
         # Print text identified in the image (if any)
         if len(my_img_obj.text) > 0:
