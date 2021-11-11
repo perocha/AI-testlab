@@ -52,6 +52,7 @@ class ComputerVision:
         '''
         try:
             # Analyse image stream
+            image_obj.open_file()
             self.__ia = self.__cv.analyze_image_in_stream (image_obj.get_image(), self.__features)
 
             # Update image description with the first caption
@@ -94,13 +95,18 @@ class ComputerVision:
         Execute image analysis to get text
         '''
         # Use OCR API to read text in image
+        image_obj.open_file()
         ocr_results = self.__cv.recognize_printed_text_in_stream(image_obj.get_image())
 
         # Process the text line by line
-        image_obj.text = ""
         for region in ocr_results.regions:
             for line in region.lines:
+                # Start a new line
+                line_string = ""
 
                 # Read the words in the line of text
                 for word in line.words:
-                    image_obj.text += word.text + ' '
+                    line_string += word.text + " "
+
+                # Once a new line is generated, add it to the image object
+                image_obj.text.append (line_string)

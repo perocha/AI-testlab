@@ -87,5 +87,6 @@ class ImageClass:
             # Save annotated image
             plt.imshow(image)
             outputfile = f"{os.curdir}/{folder}/obj_{os.path.basename(self.filename)}"
-            outputfile = f"obj_{os.path.basename(self.filename)}"
+            if __debug__:
+                outputfile = f"obj_{os.path.basename(self.filename)}"
             fig.savefig(outputfile)
