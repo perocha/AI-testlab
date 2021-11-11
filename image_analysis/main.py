@@ -48,7 +48,7 @@ def main():
 
         # Print text identified in the image (if any)
         if len(my_img_obj.text) > 0:
-            print("Text extracted from image:")
+            print("Text extracted from image (OCR API):")
             for line in my_img_obj.text:
                 print(f"{line}")
 
@@ -57,7 +57,7 @@ def main():
 
         # Print text identified in the image (if any)
         if len(my_img_obj.text) > 0:
-            print("Text extracted from image:")
+            print("Text extracted from image (Read API):")
             for line in my_img_obj.text:
                 print(f"{line}")
 
